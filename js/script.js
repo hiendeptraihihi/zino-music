@@ -1,7 +1,24 @@
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
-
-
+songs = [];
+async function fetchMovies() {
+    const response = await fetch('https://mp3.zing.vn/xhr/chart-realtime?songId=0&videoId=0&albumId=0&chart=song&time=-1');
+    // waits until the request completes...
+    const names = await response.json();
+    names.data.song.forEach(name => {
+        app.songs.push(
+            {
+                name: name.name,
+                singer: name.artists_names,
+                path: `http://api.mp3.zing.vn/api/streaming/audio/${name.id}/320`,
+                thumbnail: name.thumbnail,
+            }
+        )
+    });
+    app.start();
+  }
+fetchMovies()
+arr = ["hien", "đep"];
 
 // Init app
 const heading = $('header h2');
@@ -15,47 +32,39 @@ const prevBtn = $('.btn-prev');
 const app = {
     currentIndex: 0,
     isPlaying: false,
-    songs: [
-        {
-            name: 'Waiting For You',
-            singer: 'MONO',
-            path: './audio/WaitingForYou.mp3',
-            thumbnail: 'thumbnail/waiting-for-you.jpeg'
-        },
-        {
-            name: 'Hương',
-            singer: 'Văn Mai Hương',
-            path: './audio/Huong.mp3',
-            thumbnail: 'thumbnail/huong.jpeg'
-        },
-        {
-            name: 'Hãy Trao Cho Anh',
-            singer: 'Sơn Tùng M-TP',
-            path: './audio/HayTraoChoAnh.mp3',
-            thumbnail: 'thumbnail/hay-trao-cho-anh.jpeg'
-        },
-        {
-            name: 'Tòng Phu',
-            singer: 'KEYO',
-            path: './audio/TongPhu.mp3',
-            thumbnail: 'thumbnail/tong-phu.jpeg'
-        },
-    ],
-    render: function () {
+    songs: [],
+    render: function (name) {
         const htmls = this.songs.map(song => {
-            return `
-            <div class="song">
-                <div class="thumb" style="background-image: url('${song.thumbnail}')">
-                </div>
-                <div class="body">
-                <h3 class="title">${song.name}</h3>
-                <p class="author">${song.singer}</p>
-                </div>
-                <div class="option">
-                <i class="fas fa-ellipsis-h"></i>
-                </div>
-            </div>
-            `
+            if (name == song.name) {
+                return `
+                    <div class="song streaming">
+                        <div class="thumb" style="background-image: url('${song.thumbnail}')">
+                        </div>
+                        <div class="body">
+                        <h3 class="title">${song.name}</h3>
+                        <p class="author">${song.singer}</p>
+                        </div>
+                        <div class="option">
+                        <i class="fas fa-ellipsis-h"></i>
+                        </div>
+                    </div>
+                `
+            } else {
+                return `
+                    <div class="song">
+                        <div class="thumb" style="background-image: url('${song.thumbnail}')">
+                        </div>
+                        <div class="body">
+                        <h3 class="title">${song.name}</h3>
+                        <p class="author">${song.singer}</p>
+                        </div>
+                        <div class="option">
+                        <i class="fas fa-ellipsis-h"></i>
+                        </div>
+                    </div>
+                `
+            }
+            
         })
         $('.playlist').innerHTML = htmls.join('\n');
     },
@@ -107,7 +116,6 @@ const app = {
         }
         audio.ontimeupdate = function () {
             currentProgress = Math.floor(audio.currentTime / audio.duration * 1000) / 10;
-            console.log(currentProgress);
             progress.value = currentProgress;
         }
         progress.onchange = function () {
@@ -123,9 +131,10 @@ const app = {
         }
     },
     loadCurrentSong: function () {
-        heading.textContent = this.currentSong.name;
+        heading.textContent = this.currentSong.name + ' - ' + this.currentSong.singer;
         cdThumb.style.backgroundImage = `url('${this.currentSong.thumbnail}')`;
         audio.src = this.currentSong.path;
+        this.render(this.currentSong.name);
     },
     nextSong: function () {
         this.currentIndex++;
@@ -150,10 +159,6 @@ const app = {
 
         // Load the current song to UI
         this.loadCurrentSong()
-
-        // Render playlists
-        this.render();
     },
 }
 
-app.start();
