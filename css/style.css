@@ -1,5 +1,5 @@
 :root {
-    --primary-color: #ec1f55;
+    --primary-color: #006ee6;
     --text-color: #333;
   }
   
@@ -75,6 +75,7 @@
     border-radius: 50%;
     background-color: #333;
     background-size: cover;
+    background-position: center;
     margin: auto;
   }
   
@@ -110,21 +111,21 @@
   
   .progress {
     width: 100%;
-    -webkit-appearance: none;
+    border-radius: 6px;
     height: 6px;
     background: #d3d3d3;
     outline: none;
-    opacity: 0.7;
     -webkit-transition: 0.2s;
     transition: opacity 0.2s;
   }
   
   .progress::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 12px;
-    height: 6px;
-    background-color: var(--primary-color);
+    border: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    margin-top: 0;
     cursor: pointer;
   }
   
